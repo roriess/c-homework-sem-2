@@ -177,13 +177,15 @@ void drawindLine(FILE* f, Data* data, const int* countOfSpaces,
             for (int k = 0; k < countOfSpaces[columnNumber] - countWidth; k++)
                 fprintf(f, " ");
         }
-        fprintf(f, " ║\n");
+        fprintf(f, " ");
+        fprintf(f, titleDivider);
+        fprintf(f, "\n");
 
         if (i + 1 < data->linesCount) {
             if (!flag) {
-                dividers(f, data, countOfSpaces, "╠", "┼", "╣", "⁠─");
+                dividers(f, data, countOfSpaces, "+", "+", "+", "⁠-");
             } else {
-                dividers(f, data, countOfSpaces, "╠", "╬", "╣", "═");
+                dividers(f, data, countOfSpaces, "+", "+", "+", "=");
                 flag = 0;
             }
         }
@@ -199,8 +201,8 @@ void dataFormatting(Data* data, const char* newFileName, const int* countOfSpace
     }
 
     const int widthOfTable = tableWidth(data, countOfSpaces);
-    dividers(f, data, countOfSpaces, "╔", "╦", "╗", "═");
-    drawindLine(f, data, countOfSpaces, "║", "│");
-    dividers(f, data, countOfSpaces, "╚", "╧", "╝", "═");
+    dividers(f, data, countOfSpaces, "+", "+", "+", "=");
+    drawindLine(f, data, countOfSpaces, "|", "|");
+    dividers(f, data, countOfSpaces, "+", "+", "+", "=");
     fclose(f);
 }

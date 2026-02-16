@@ -1,9 +1,15 @@
 #include "operations.c"
 #include <stdio.h>
 
-void main()
+int main(int argc, char* argv[])
 {
-    Data* text = readText("input.csv");
+    if (argc != 3)
+        return 1;
+
+    const char* inputName = argv[1];
+    const char* outputName = argv[2];
+
+    Data* text = readText(inputName);
     text->columnCount = countColumns(text);
-    dataFormatting(text, "output.txt", columnWidth(text));
+    dataFormatting(text, outputName, columnWidth(text));
 }
