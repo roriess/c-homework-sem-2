@@ -118,13 +118,13 @@ void dividers(FILE* f, Data* data, const int* countOfSpaces, const char* plus, c
     fprintf(f, "\n");
 }
 
-int isNumber(char* str[])
+int isNumber(char* str)
 {
-    char* elements[11] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "." };
-    for (int i = 0; str[i] != "\0"; i++) {
+    char elements[11] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' };
+    for (int i = 0; str[i] != '\0'; i++) {
         int flag = 0;
         for (int j = 0; j < 11; j++) {
-            if (str[i] == elements[i])
+            if (str[i] == elements[j])
                 flag = 1;
         }
         if (!flag)
@@ -147,7 +147,11 @@ void drawingLine(FILE* f, Data* data, const int* countOfSpaces, char* divider)
                 buffer[lenBuffer++] = str[j];
             } else {
                 buffer[lenBuffer] = '\0';
-                fprintf(f, "│ %-*s ", countOfSpaces[columnNumber], buffer);
+                if (isNumber(buffer)) {
+                    fprintf(f, "│ %*s ", countOfSpaces[columnNumber], buffer);
+                } else {
+                    fprintf(f, "│ %-*s ", countOfSpaces[columnNumber], buffer);
+                }
                 columnNumber++;
                 free(buffer);
                 buffer = malloc(sizeof(char) * widthOfTable);
@@ -155,7 +159,11 @@ void drawingLine(FILE* f, Data* data, const int* countOfSpaces, char* divider)
             }
         }
         buffer[lenBuffer] = '\0';
-        fprintf(f, "│ %-*s |", countOfSpaces[columnNumber], buffer);
+        if (isNumber(buffer)) {
+            fprintf(f, "│ %*s |", countOfSpaces[columnNumber], buffer);
+        } else {
+            fprintf(f, "│ %-*s |", countOfSpaces[columnNumber], buffer);
+        }
         fprintf(f, "\n");
         free(buffer);
 
