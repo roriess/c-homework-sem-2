@@ -22,17 +22,13 @@ const int tableWidth(Data* data, const int* countOfSpaces);
 
 // рисование границ таблицы (внешних и внутренних)
 void dividers(FILE* f, Data* data, const int* countOfSpaces,
-    const char* left, const char* middle, const char* right, const char* line);
-
-// проверка, что символ - цифра
-int isDigit(char* str);
+    const char* plus, const char* line);
 
 // проверка, что строка - число
 int isNumber(char* str[]);
 
 // рисование границ между столбцами и добаление данных в файл
-void drawindLine(FILE* f, Data* data, const int* countOfSpaces,
-    char* titleDivider, char* ordinaryDivider);
+void drawingLine(FILE* f, Data* data, const int* countOfSpaces, char* divider);
 
 // итоговая рисовка
 void dataFormatting(Data* data, const char* newFileName, const int* countOfSpaces);

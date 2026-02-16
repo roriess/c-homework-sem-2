@@ -100,95 +100,67 @@ const int tableWidth(Data* data, const int* countOfSpaces)
     return widthOfTable;
 }
 
-void dividers(FILE* f, Data* data, const int* countOfSpaces,
-    const char* left, const char* middle, const char* right, const char* line)
+void dividers(FILE* f, Data* data, const int* countOfSpaces, const char* plus, const char* line)
 {
-    fprintf(f, left);
+    fprintf(f, plus);
     fprintf(f, line);
     for (int i = 0; i < data->columnCount; i++) {
         for (int j = 0; j < countOfSpaces[i]; j++)
             fprintf(f, line);
         if (i + 1 != data->columnCount) {
             fprintf(f, line);
-            fprintf(f, middle);
+            fprintf(f, plus);
             fprintf(f, line);
         }
     }
     fprintf(f, line);
-    fprintf(f, right);
+    fprintf(f, plus);
     fprintf(f, "\n");
-}
-
-int isDigit(char* str)
-{
-    char* elements[11] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "." };
-    int flag = 0;
-    for (int i = 0; i < 11; i++) {
-        if (str == elements[i])
-            flag = 1;
-    }
-    return flag;
 }
 
 int isNumber(char* str[])
 {
+    char* elements[11] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "." };
     for (int i = 0; str[i] != "\0"; i++) {
-        if (!isDigit(str[i]))
+        int flag = 0;
+        for (int j = 0; j < 11; j++) {
+            if (str[i] == elements[i])
+                flag = 1;
+        }
+        if (!flag)
             return 0;
     }
     return 1;
 }
 
-void drawindLine(FILE* f, Data* data, const int* countOfSpaces,
-    char* titleDivider, char* ordinaryDivider)
+void drawingLine(FILE* f, Data* data, const int* countOfSpaces, char* divider)
 {
-    int flag = 1; // flag == 1 - заголовок
+    char* buffer;
+    int widthOfTable = tableWidth(data, countOfSpaces);
     for (int i = 0; i < data->linesCount; i++) {
         const char* str = data->data[i];
-        fprintf(f, titleDivider);
-        fprintf(f, " ");
-        int countWidth = 0, columnNumber = 0;
+        int columnNumber = 0;
+        buffer = malloc(sizeof(char) * widthOfTable);
+        int lenBuffer = 0;
         for (int j = 0; str[j] != '\0'; j++) {
-            char* buffer = malloc(sizeof(char*) * countOfSpaces[columnNumber]);
-            int len = 0;
             if (str[j] != ',') {
-                buffer[len++] = str[j];
-                fprintf(f, "%c", str[j]);
-                countWidth++;
+                buffer[lenBuffer++] = str[j];
             } else {
-                if (countWidth < countOfSpaces[columnNumber]) {
-                    for (int k = 0; k < countOfSpaces[columnNumber] - countWidth; k++)
-                        fprintf(f, " ");
-                }
-                fprintf(f, " ");
-                if (flag) {
-                    fprintf(f, "%s", titleDivider);
-                } else {
-                    fprintf(f, "%s", ordinaryDivider);
-                }
-                fprintf(f, " ");
+                buffer[lenBuffer] = '\0';
+                fprintf(f, "│ %-*s ", countOfSpaces[columnNumber], buffer);
                 columnNumber++;
                 free(buffer);
-                char* buffer = malloc(sizeof(char*) * countOfSpaces[columnNumber]);
-                len = 0, countWidth = 0;
+                buffer = malloc(sizeof(char) * widthOfTable);
+                lenBuffer = 0;
             }
         }
-        if (countWidth < countOfSpaces[columnNumber]) {
-            for (int k = 0; k < countOfSpaces[columnNumber] - countWidth; k++)
-                fprintf(f, " ");
-        }
-        fprintf(f, " ");
-        fprintf(f, titleDivider);
+        buffer[lenBuffer] = '\0';
+        fprintf(f, "│ %-*s |", countOfSpaces[columnNumber], buffer);
         fprintf(f, "\n");
+        free(buffer);
 
-        if (i + 1 < data->linesCount) {
-            if (!flag) {
-                dividers(f, data, countOfSpaces, "+", "+", "+", "⁠-");
-            } else {
-                dividers(f, data, countOfSpaces, "+", "+", "+", "=");
-                flag = 0;
-            }
-        }
+        if (i + 1 < data->linesCount)
+            dividers(f, data, countOfSpaces, "+", "-");
     }
 }
 
@@ -199,10 +171,9 @@ void dataFormatting(Data* data, const char* newFileName, const int* countOfSpace
         printf("File not found or created.");
         exit(1);
     }
-
     const int widthOfTable = tableWidth(data, countOfSpaces);
-    dividers(f, data, countOfSpaces, "+", "+", "+", "=");
-    drawindLine(f, data, countOfSpaces, "|", "|");
-    dividers(f, data, countOfSpaces, "+", "+", "+", "=");
+    dividers(f, data, countOfSpaces, "+", "=");
+    drawingLine(f, data, countOfSpaces, "|");
+    dividers(f, data, countOfSpaces, "+", "=");
     fclose(f);
 }
