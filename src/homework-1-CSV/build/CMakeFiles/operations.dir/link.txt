@@ -1,0 +1,2 @@
+C:\MinGW\bin\ar.exe qc liboperations.a CMakeFiles/operations.dir/operations.c.obj
+C:\MinGW\bin\ranlib.exe liboperations.a
