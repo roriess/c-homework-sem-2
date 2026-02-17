@@ -12,4 +12,6 @@ int main(int argc, char* argv[])
     Data* text = readText(inputName);
     text->columnCount = countColumns(text);
     dataFormatting(text, outputName, columnWidth(text));
+
+    return 0;
 }
