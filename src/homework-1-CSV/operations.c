@@ -89,9 +89,7 @@ int countColumns(Data* data)
 const int* columnWidth(Data* data)
 {
     int columnCount = countColumns(data);
-    int* spaces = malloc(sizeof(int) * columnCount);
-    for (int i = 0; i < columnCount; i++)
-        spaces[i] = 0;
+    int* spaces = calloc(columnCount, sizeof(int));
 
     for (int i = 0; i < data->linesCount; i++) {
         const char* str = data->data[i];
