@@ -1,7 +1,7 @@
 #include "operations.h"
 #include <assert.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 void testReadText()
 {

@@ -1,8 +1,35 @@
-#define _GNU_SOURCE
 #include "operations.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+char* readLine(FILE* f)
+{
+    int maxSize = 100;
+    char* line = malloc(sizeof(char) * maxSize);
+    char c;
+    int pos = 0;
+    while ((c = fgetc(f)) != EOF && c != '\n') {
+        line[pos++] = c;
+
+        if (pos >= maxSize) {
+            maxSize *= 2;
+            char* temp = realloc(line, sizeof(char) * maxSize);
+            if (temp == NULL) {
+                printf("Memory allocation error.\n");
+                free(line);
+                break;
+            }
+            line = temp;
+        }
+    }
+    if (c == EOF) {
+        free(line);
+        return NULL;
+    }
+    line[pos] = '\0';
+    return line;
+}
 
 Data* readText(const char* fileName)
 {
@@ -23,36 +50,28 @@ Data* readText(const char* fileName)
     }
     data->linesCount = 0;
 
-    while (!feof(f)) {
-        char* buffer = malloc(sizeof(char) * 100);
-        if (buffer == NULL)
-            return NULL;
-        const int readBytes = fscanf(f, "%[^\n]", buffer);
-        if (readBytes < 0) {
-            free(buffer);
-            break;
-        }
-
+    char* line;
+    while ((line = readLine(f)) != NULL) {
         if (data->linesCount >= maxLines) {
             maxLines *= 2;
             char** temp = realloc(data->data, sizeof(char*) * maxLines);
             if (temp == NULL) {
                 printf("Memory allocation error.\n");
-                free(buffer);
+                free(line);
                 break;
             }
             data->data = temp;
         }
 
-        data->data[data->linesCount] = buffer;
+        data->data[data->linesCount] = line;
         data->linesCount++;
-
-        // так как scanf читает до '\n', удалаяем оставшийся символ '\n'
-        int c = fgetc(f);
-        if (c != EOF && c != '\n')
-            ungetc(c, f);
     }
     fclose(f);
+    if (data->linesCount > 0) {
+        data->columnCount = countColumns(data);
+    } else {
+        data->columnCount = 0;
+    }
     return data;
 }
 

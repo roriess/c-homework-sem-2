@@ -8,6 +8,9 @@ typedef struct {
     int columnCount;
 } Data;
 
+// динамическое чтение одной строки файла
+char* readLine(FILE* f);
+
 // чтение данных из input.csv в массив указателей на строки
 Data* readText(const char* fileName);
 
