@@ -33,7 +33,7 @@ Data* readText(const char* fileName)
 
         if (data->linesCount >= maxLines) {
             maxLines *= 2;
-            const char** temp = realloc(data->data, sizeof(char*) * maxLines);
+            char** temp = realloc(data->data, sizeof(char*) * maxLines);
             if (temp == NULL) {
                 printf("Memory allocation error.\n");
                 free(buffer);
@@ -152,10 +152,10 @@ void drawingLine(FILE* f, Data* data, const int* countOfSpaces, char* divider)
                 } else {
                     fprintf(f, "│ %-*s ", countOfSpaces[columnNumber], buffer);
                 }
-                columnNumber++;
                 free(buffer);
                 buffer = malloc(sizeof(char) * widthOfTable);
                 lenBuffer = 0;
+                columnNumber++;
             }
         }
         buffer[lenBuffer] = '\0';

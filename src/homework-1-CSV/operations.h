@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 typedef struct {
-    const char** data;
+    char** data;
     int linesCount;
     int columnCount;
 } Data;
