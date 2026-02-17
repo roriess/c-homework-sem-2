@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include "operations.h"
 #include <ctype.h>
 #include <stdio.h>
@@ -22,13 +23,15 @@ Data* readText(const char* fileName)
     }
     data->linesCount = 0;
 
-    char* buffer = NULL;
-    size_t len = 0;
-    ssize_t read;
-
-    while ((read = getline(&buffer, &len, f)) != -1) {
-        if (read > 0 && buffer[read - 1] == '\n')
-            buffer[read - 1] = '\0';
+    while (!feof(f)) {
+        char* buffer = malloc(sizeof(char) * 100);
+        if (buffer == NULL)
+            return NULL;
+        const int readBytes = fscanf(f, "%[^\n]", buffer);
+        if (readBytes < 0) {
+            free(buffer);
+            break;
+        }
 
         if (data->linesCount >= maxLines) {
             maxLines *= 2;
@@ -44,16 +47,16 @@ Data* readText(const char* fileName)
         data->data[data->linesCount] = buffer;
         data->linesCount++;
 
-        buffer = NULL;
-        len = 0;
+        // так как scanf читает до '\n', удалаяем оставшийся символ '\n'
+        int c = fgetc(f);
+        if (c != EOF && c != '\n')
+            ungetc(c, f);
     }
-    if (buffer)
-        free(buffer);
     fclose(f);
     return data;
 }
 
-const int countColumns(Data* data)
+int countColumns(Data* data)
 {
     const char* str = data->data[0];
     int count = 0;
@@ -91,7 +94,7 @@ const int* columnWidth(Data* data)
     return spaces;
 }
 
-const int tableWidth(Data* data, const int* countOfSpaces)
+int tableWidth(Data* data, const int* countOfSpaces)
 {
     int widthOfTable = 0;
     for (int i = 0; i < data->columnCount; i++)
@@ -119,6 +122,9 @@ void dividers(FILE* f, Data* data, const int* countOfSpaces, const char* plus, c
 
 int isNumber(char* str)
 {
+    if (str == NULL || str[0] == '\0')
+        return 0;
+
     int countDots = 0;
     for (int i = 0; str[i] != '\0'; i++) {
         if (!isdigit(str[i])) {
@@ -134,7 +140,7 @@ int isNumber(char* str)
     return 1;
 }
 
-void drawingLine(FILE* f, Data* data, const int* countOfSpaces, char* divider)
+void drawingLine(FILE* f, Data* data, const int* countOfSpaces)
 {
     dividers(f, data, countOfSpaces, "+", "=");
     int widthOfTable = tableWidth(data, countOfSpaces);
@@ -189,7 +195,7 @@ void dataFormatting(Data* data, const char* newFileName, const int* countOfSpace
         printf("File not found or created.");
         exit(1);
     }
-    const int widthOfTable = tableWidth(data, countOfSpaces);
-    drawingLine(f, data, countOfSpaces, "|");
+
+    drawingLine(f, data, countOfSpaces);
     fclose(f);
 }
