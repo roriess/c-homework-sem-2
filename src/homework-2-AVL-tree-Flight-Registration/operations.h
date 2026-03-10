@@ -22,7 +22,7 @@ int loadAirports();
 // нахождение аэропорта в дереве по iata_code
 void findAirport(char key);
 
-// добавление аэропорта в дерево по iata_code и name 
+// добавление аэропорта в дерево по iata_code и name
 void addAirport(char key, char name);
 
 // удаление аэропорта по iata_code
