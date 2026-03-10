@@ -16,17 +16,23 @@ typedef struct AVLTree {
     unsigned int airportCount;
 } AVLTree;
 
+// создание узла дерева
+Node* createNode(const char* key, const char* name);
+
+// создание дерева
+AVLTree* createAVLTree();
+
 // загрузка аэропортов в АВЛ-дерево
 int loadAirports();
 
 // нахождение аэропорта в дереве по iata_code
-void findAirport(char key);
+void findAirport(const char* key);
 
 // добавление аэропорта в дерево по iata_code и name
-void addAirport(char key, char name);
+void addAirport(const char* key, const char* name);
 
 // удаление аэропорта по iata_code
-void deleteAirport(char key);
+void deleteAirport(const char* key);
 
 // сохранение текущего состояния в airports.txt
 void saveCurrentStatus();
