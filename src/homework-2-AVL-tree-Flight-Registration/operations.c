@@ -1,6 +1,12 @@
 #include "operations.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+#define MAXLINELENGTH 100
+#define MAXKEYLENGTH 10
+#define MAXNAMELENGTH 90
 
 // // структура узла АВЛ-дерева
 // typedef struct Node {
@@ -59,6 +65,26 @@ AVLTree* createAVLTree()
 
 int loadAirports()
 {
+    FILE* f = fopen("airports.txt", "r");
+    if (f == NULL)
+        return 0;
+
+    AVLTree* tree = createAVLTree();
+
+    char line[MAXLINELENGTH];
+    fgets(line, MAXLINELENGTH, f); // пропускаем первую строку с названиями колонок
+
+    // UTK:Utirik Airport
+    char airportKey[MAXKEYLENGTH];
+    char airportName[MAXNAMELENGTH];
+    while (fgets(line, MAXLINELENGTH, f)) {
+        sscanf(line, "%s %[^\n]", airportKey, airportName);
+        Node* node = createNode(airportKey, airportName);
+        // нужна функция для добавления узла в дерево
+    }
+    fclose(f);
+
+    return tree->airportCount;
 }
 
 void findAirport(const char* key)
