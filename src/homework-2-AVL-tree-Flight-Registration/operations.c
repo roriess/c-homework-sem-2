@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #define MAXLINELENGTH 100
 #define MAXKEYLENGTH 10
 #define MAXNAMELENGTH 90
