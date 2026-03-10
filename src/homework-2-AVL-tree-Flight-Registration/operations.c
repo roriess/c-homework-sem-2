@@ -29,8 +29,8 @@ Node* createNode(const char* key, const char* name)
     if (node == NULL)
         return NULL;
 
-    node->key = malloc(strlen(key) + 1);
-    node->airportName = malloc(strlen(name) + 1);
+    node->key = malloc(strlen(key) + 1); // + 1 для "\0"
+    node->airportName = malloc(strlen(name) + 1); // + 1 для "\0"
 
     if (node->key == NULL || node->airportName == NULL) {
         free(node->key);
@@ -45,7 +45,7 @@ Node* createNode(const char* key, const char* name)
     node->leftNode = NULL;
     node->rightNode = NULL;
     node->parentNode = NULL;
-    node->height = 1;
+    node->height = 0;
 
     return node;
 }
@@ -62,6 +62,23 @@ AVLTree* createAVLTree()
     return tree;
 }
 
+Node* addNode(Node* root, const char* key, const char* name)
+{
+    if (root == NULL) // если дошли до низа дерева
+        root = createNode(key, name);
+
+    if (strcmp(node->key, root->key) < 0) {
+        root->leftNode = addNode(root->leftNode, key, name);
+        if (root->leftNode)
+            root->leftNode->parentNode = root;
+    } else {
+        root->rightNode = addNode(root->rightNode, key, name);
+        if (root->rightNode)
+            root->rightNode->parentNode = root;
+    }
+    return root;
+}
+
 int loadAirports()
 {
     FILE* f = fopen("airports.txt", "r");
@@ -71,7 +88,6 @@ int loadAirports()
     AVLTree* tree = createAVLTree();
 
     char line[MAXLINELENGTH];
-    fgets(line, MAXLINELENGTH, f); // пропускаем первую строку с названиями колонок
 
     // UTK:Utirik Airport
     char airportKey[MAXKEYLENGTH];
@@ -79,6 +95,11 @@ int loadAirports()
     while (fgets(line, MAXLINELENGTH, f)) {
         sscanf(line, "%s %[^\n]", airportKey, airportName);
         Node* node = createNode(airportKey, airportName);
+        if (tree->root == NULL) {
+            tree->root = node;
+            tree->airportCount = 1;
+            continue;
+        }
         // нужна функция для добавления узла в дерево
     }
     fclose(f);

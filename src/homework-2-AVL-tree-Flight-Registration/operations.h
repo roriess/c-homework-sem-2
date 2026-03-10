@@ -22,6 +22,9 @@ Node* createNode(const char* key, const char* name);
 // создание дерева
 AVLTree* createAVLTree();
 
+// добавление узла в обычное бин дерево поиска (без АВЛ свойств)
+Node* addNode(Node* root, const char* key, const char* name);
+
 // загрузка аэропортов в АВЛ-дерево
 int loadAirports();
 
