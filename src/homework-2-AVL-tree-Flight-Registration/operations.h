@@ -22,11 +22,21 @@ Node* createNode(const char* key, const char* name);
 // создание дерева
 AVLTree* createAVLTree();
 
+// левый малый поворот
+Node* rotateLeft(Node* a);
+
+// правый малый поворот
+Node* rotateRight(Node* a);
+
+int getBalance(Node* node);
+
+Node* balance(Node* node);
+
 // добавление узла в обычное бин дерево поиска (без АВЛ свойств)
 Node* addNode(Node* root, const char* key, const char* name);
 
 // загрузка аэропортов в АВЛ-дерево
-int loadAirports();
+int loadAirports(AVLTree* tree);
 
 // нахождение аэропорта в дереве по iata_code
 void findAirport(const char* key);
