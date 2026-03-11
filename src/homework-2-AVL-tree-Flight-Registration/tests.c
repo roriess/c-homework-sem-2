@@ -1,5 +1,5 @@
-#include "operations.h"
 #include "tests.h"
+#include "operations.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

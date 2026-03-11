@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #define MAXLINELENGTH 100
 
 int main(int argc, char* argv[])
