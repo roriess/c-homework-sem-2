@@ -1,7 +1,9 @@
-#include "operations.c"
+#include "operations.h"
+#include "tests.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 
 #define MAXLINELENGTH 100
 
@@ -10,31 +12,35 @@ int main(int argc, char* argv[])
     if (argc < 2)
         return 1;
 
-    // int airportCount = loadAirports();
-    // printf("Загружено %d аэропортов. Система готова к работе.\n", airportCount);
+    if (argc == 3 && strcmp(argv[2], "--test") == 0) {
+        test();
+    } else {
+        int airportCount = loadAirports();
+        printf("Загружено %d аэропортов. Система готова к работе.\n", airportCount);
 
-    // char line[MAXLINELENGTH];
-    // while (1)
-    // {
-    //     fgets(line, MAXLINELENGTH, stdin);
+        char line[MAXLINELENGTH];
+        while (1) {
+            fgets(line, MAXLINELENGTH, stdin);
 
-    //     char command[20];
-    //     char argument[100];
-    //     sscanf(line, "%s %[^\n]", command, argument);
+            char command[20];
+            char argument[100];
+            sscanf(line, "%s %99[^\n]", command, argument);
 
-    //     if (command == "find") {
-    //         findAirport(argument);
-    //     }
-    //     if (command == "add") {
-    //         addAirport(argument);
-    //     }
-    //     if (command == "delete") {
-    //         deleteAirport(argument);
-    //     }
-    //     if (command == "save") {
-    //         saveСurrentStatus();
-    //     }
-    //     if (command == "quit")
-    //         return;
-    // }
+            if (strcmp(command, "find") == 0)
+                findAirport(argument);
+
+            if (strcmp(command, "add") == 0)
+                addAirport(argument);
+
+            if (strcmp(command, "delete") == 0)
+                deleteAirport(argument);
+
+            if (strcmp(command, "save") == 0)
+                saveCurrentStatus();
+
+            if (strcmp(command, "quit") == 0)
+                quit();
+        }
+        return 0;
+    }
 }

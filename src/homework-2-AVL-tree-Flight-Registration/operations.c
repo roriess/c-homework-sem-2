@@ -13,8 +13,8 @@ Node* createNode(const char* key, const char* name)
     if (node == NULL)
         return NULL;
 
-    node->key = malloc(strlen(key) + 1); // + 1 для "\0"
-    node->airportName = malloc(strlen(name) + 1); // + 1 для "\0"
+    node->key = malloc(strlen(key) + 1);
+    node->airportName = malloc(strlen(name) + 1);
 
     if (node->key == NULL || node->airportName == NULL) {
         free(node->key);
@@ -132,7 +132,7 @@ Node* balance(Node* node)
 
 Node* addNode(Node* root, const char* key, const char* name)
 {
-    if (root == NULL) // если дошли до низа дерева
+    if (root == NULL)
         return createNode(key, name);
 
     int cmp = strcmp(key, root->key);
@@ -149,20 +149,24 @@ Node* addNode(Node* root, const char* key, const char* name)
     }
 
     updateHeight(root);
-
     return balance(root);
 }
 
 AVLTree* tree = NULL;
 
-int loadAirports(AVLTree* tree)
+int loadAirports()
 {
-    if (tree == NULL)
-        return -1;
-    FILE* f = fopen("airports.txt", "r");
-    if (f == NULL)
-        return -1;
+    if (tree == NULL) {
+        tree = createAVLTree();
+        if (tree == NULL)
+            return -1;
+    }
 
+    FILE* f = fopen("airports.txt", "r");
+    if (!f) {
+        printf("Ошибка при открытии файла для записи.\n");
+        return -1;
+    }
     char line[MAXLINELENGTH];
     char airportKey[MAXKEYLENGTH];
     char airportName[MAXNAMELENGTH];
@@ -201,17 +205,16 @@ Node* minValueNode(Node* node)
 
 Node* deleteNode(Node* root, const char* key)
 {
-    if (root == NULL) {
+    if (root == NULL)
         return NULL;
-    }
 
     int cmp = strcmp(key, root->key);
     if (cmp < 0) {
-        root->leftNode = deleteNode(root->leftNode);
+        root->leftNode = deleteNode(root->leftNode, key);
         if (root->leftNode)
             root->leftNode->parentNode = root;
     } else if (cmp > 0) {
-        root->rightNode = deleteNode(root->rightNode);
+        root->rightNode = deleteNode(root->rightNode, key);
         if (root->rightNode)
             root->rightNode->parentNode = root;
     } else {
@@ -268,27 +271,42 @@ void findAirport(const char* key)
     }
 }
 
-void addAirport(const char* key, const char* name)
+void addAirport(const char* argument)
 {
     if (tree == NULL) {
         tree = createAVLTree();
         if (tree == NULL) {
+            printf("Ошибка создания дерева.\n");
             return;
         }
     }
-    tree->root = addNode(tree->root, key, name);
-    tree->airportCount++;
-    printf("Аэропорт '%s' добавлен в базу.\n", key);
+
+    char key[MAXKEYLENGTH];
+    char name[MAXNAMELENGTH];
+
+    if (sscanf(argument, "%[^:]:%[^\n]", key, name) == 2) {
+        if (findNode(tree->root, key) != NULL) {
+            printf("Аэропорт с кодом '%s' уже существует.\n", key);
+            return;
+        }
+        tree->root = addNode(tree->root, key, name);
+        tree->airportCount++;
+        printf("Аэропорт '%s' добавлен в базу.\n", key);
+    }
 }
 
 void deleteAirport(const char* key)
 {
     if (tree == NULL || tree->root == NULL) {
+        printf("База данных не загружена или пуста.\n");
+        return;
+    }
+    if (findNode(tree->root, key) == NULL) {
+        printf("Аэропорт с кодом '%s' не найден в базе.\n", key);
         return;
     }
     tree->root = deleteNode(tree->root, key);
     tree->airportCount--;
-
     printf("Аэропорт '%s' удалён из базы.\n", key);
 }
 
@@ -326,6 +344,5 @@ void quit()
         free(tree);
         tree = NULL;
     }
-    printf("Программа завершена.\n");
     exit(0);
 }
