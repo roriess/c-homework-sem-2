@@ -10,14 +10,16 @@
 Node* createNode(const char* key, const char* name)
 {
     Node* node = malloc(sizeof(Node));
-    if (node == NULL)
-        return NULL;
+    if (node == NULL) {
+        printf("Ошибка выделения памяти для узла.\n") return NULL;
+    }
 
     node->key = malloc(strlen(key) + 1);
     node->airportName = malloc(strlen(name) + 1);
 
     if (node->key == NULL || node->airportName == NULL) {
-        free(node->key);
+        printf("Ошибка выделения памяти для данных узла.\n")
+            free(node->key);
         free(node->airportName);
         free(node);
         return NULL;
@@ -37,8 +39,9 @@ Node* createNode(const char* key, const char* name)
 AVLTree* createAVLTree()
 {
     AVLTree* tree = malloc(sizeof(AVLTree));
-    if (tree == NULL)
-        return NULL;
+    if (tree == NULL) {
+        printf("Ошибка выделения памяти для дерева.\n") return NULL;
+    }
 
     tree->root = NULL;
     tree->airportCount = 0;
@@ -105,8 +108,9 @@ int getBalance(Node* node)
 
 Node* balance(Node* node)
 {
-    if (node == NULL)
-        return NULL;
+    if (node == NULL) {
+        printf("Ошибка выделения памяти для узла.\n") return NULL;
+    }
 
     int bal = getBalance(node);
 
@@ -158,8 +162,10 @@ int loadAirports()
 {
     if (tree == NULL) {
         tree = createAVLTree();
-        if (tree == NULL)
+        if (tree == NULL) {
+            printf("Ошибка создания дерева.\n");
             return -1;
+        }
     }
 
     FILE* f = fopen("airports.txt", "r");

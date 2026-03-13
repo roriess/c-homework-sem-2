@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 // структура узла АВЛ-дерева
 typedef struct Node {
     char* key;
