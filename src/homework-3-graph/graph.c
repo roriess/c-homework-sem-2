@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Graph* createGraph(int cityCount) {
+Graph* createGraph(int cityCount)
+{
     Graph* graph = (Graph*)malloc(sizeof(Graph));
     graph->cityCount = cityCount;
     graph->roadCount = 0;
@@ -15,7 +16,8 @@ Graph* createGraph(int cityCount) {
     return graph;
 }
 
-void addEdgeToGraph(Graph* graph, int city1, int city2, int len) {
+void addEdgeToGraph(Graph* graph, int city1, int city2, int len)
+{
     graph->degree[city1]++;
     graph->degree[city2]++;
     graph->roadCount++;
@@ -30,7 +32,8 @@ void addEdgeToGraph(Graph* graph, int city1, int city2, int len) {
     graph->adj[city2][graph->degree[city2] - 1].len = len;
 }
 
-Graph* readGraph(FILE* file) {
+Graph* readGraph(FILE* file)
+{
     int n, m;
     fscanf(file, "%d %d", &n, &m);
 
@@ -46,7 +49,8 @@ Graph* readGraph(FILE* file) {
     return graph;
 }
 
-void freeGraph(Graph* graph) {
+void freeGraph(Graph* graph)
+{
     for (int i = 0; i < graph->cityCount; i++) {
         free(graph->adj[i]);
     }

@@ -1,16 +1,17 @@
 #include "dijkstra.h"
 #include "heap.h"
-#include <stdlib.h>
 #include <limits.h>
+#include <stdlib.h>
 
-void dijkstra(Graph* graph, int capitalsСount, int* capitals, int** distanceOut, int** ownerOut) {
+void dijkstra(Graph* graph, int capitalsСount, int* capitals, int** distanceOut, int** ownerOut)
+{
     int cityCount = graph->cityCount;
 
     int* distance = (int*)malloc(cityCount * sizeof(int)); // текущие расстояния до городов
     int* owner = (int*)malloc(cityCount * sizeof(int)); // индексы столиц (от 0 до сapitalCount-1), к которым относится каждый город
 
     for (int i = 0; i < cityCount; i++) {
-        distance[i] = INT_MAX; 
+        distance[i] = INT_MAX;
         owner[i] = -1;
     }
 
@@ -26,11 +27,11 @@ void dijkstra(Graph* graph, int capitalsСount, int* capitals, int** distanceOut
 
     while (!emptyHeap(heap)) {
         HeapNode node = popHeap(heap);
-    
+
         int dist = node.distance;
         int cityNumber = node.cityNumber;
         int state = node.state;
-    
+
         if (dist > distance[cityNumber])
             continue;
 
@@ -38,7 +39,7 @@ void dijkstra(Graph* graph, int capitalsСount, int* capitals, int** distanceOut
             int v = graph->adj[cityNumber][i].to;
             int w = graph->adj[cityNumber][i].len;
             int newDistance = dist + w;
-    
+
             if (newDistance < distance[v]) {
                 distance[v] = newDistance;
                 owner[v] = state;

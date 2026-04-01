@@ -1,16 +1,17 @@
+#include "dijkstra.h"
+#include "graph.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
-#include "graph.h"
-#include "dijkstra.h"
 
-void testTwoCapitals() {
+void testTwoCapitals()
+{
     Graph* graph = createGraph(3);
 
     addEdgeToGraph(graph, 0, 1, 1);
     addEdgeToGraph(graph, 1, 2, 1);
 
-    int capitals[] = {1, 3};
+    int capitals[] = { 1, 3 };
 
     int* distance;
     int* owner;
@@ -25,7 +26,8 @@ void testTwoCapitals() {
     freeGraph(graph);
 }
 
-void testThreeCapitals() {
+void testThreeCapitals()
+{
     Graph* graph = createGraph(4);
 
     addEdgeToGraph(graph, 0, 1, 1);
@@ -33,7 +35,7 @@ void testThreeCapitals() {
     addEdgeToGraph(graph, 2, 3, 1);
     addEdgeToGraph(graph, 3, 0, 1);
 
-    int capitals[] = {1, 2, 3};
+    int capitals[] = { 1, 2, 3 };
 
     int* distance;
     int* owner;
@@ -50,13 +52,14 @@ void testThreeCapitals() {
     freeGraph(graph);
 }
 
-void testWeights() {
-    Graph* graph= createGraph(3);
+void testWeights()
+{
+    Graph* graph = createGraph(3);
 
     addEdgeToGraph(graph, 0, 1, 10);
     addEdgeToGraph(graph, 0, 2, 5);
 
-    int capitals[] = {1, 2};
+    int capitals[] = { 1, 2 };
 
     int* distance;
     int* owner;
@@ -72,7 +75,8 @@ void testWeights() {
     freeGraph(graph);
 }
 
-int main() {
+int main()
+{
     testTwoCapitals();
     testThreeCapitals();
     testWeights();

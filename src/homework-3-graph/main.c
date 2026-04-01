@@ -1,9 +1,10 @@
+#include "dijkstra.h"
+#include "graph.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "graph.h"
-#include "dijkstra.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[])
+{
     FILE* input;
     if (argc > 1) {
         input = fopen(argv[1], "r");
@@ -24,7 +25,7 @@ int main(int argc, char *argv[]) {
     int* capitals = (int*)malloc(capitalsСount * sizeof(int));
     for (int i = 0; i < capitalsСount; i++) {
         if (fscanf(input, "%d", &capitals[i]) != 1) {
-            fprintf(stderr, "Failed to read capital %d\n", i+1);
+            fprintf(stderr, "Failed to read capital %d\n", i + 1);
             return 1;
         }
     }
@@ -57,7 +58,8 @@ int main(int argc, char *argv[]) {
         printf("\n");
     }
 
-    for (int i = 0; i < capitalsСount; i++) free(states[i]);
+    for (int i = 0; i < capitalsСount; i++)
+        free(states[i]);
     free(states);
     free(index);
     free(counts);
