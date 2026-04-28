@@ -30,7 +30,7 @@ void testAddMultipleNode(void)
     AVLTree* tree = resetTree();
 
     addAirport(tree, "C", "Charlie");
-    addAirport(tree, "A","Alpha");
+    addAirport(tree, "A", "Alpha");
     addAirport(tree, "B", "Bravo");
     addAirport(tree, "D", "Delta");
     addAirport(tree, "E", "Echo");

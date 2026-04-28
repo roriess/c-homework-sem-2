@@ -10,11 +10,13 @@
 
 int main(int argc, char* argv[])
 {
-    if (argc < 2) return 1;
+    if (argc < 2)
+        return 1;
 
     if (argc == 3 && strcmp(argv[2], "--test") == 0) {
         AVLTree* tree = createAVLTree();
-        if (tree == NULL) return -1;
+        if (tree == NULL)
+            return -1;
         testTree();
     } else {
         AVLTree* tree = loadAirports(NULL);

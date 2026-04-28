@@ -22,15 +22,16 @@ typedef struct AVLTree {
     unsigned int airportCount;
 } AVLTree;
 
-
-unsigned int getAirportCount(const AVLTree* tree) {
+unsigned int getAirportCount(const AVLTree* tree)
+{
     return tree->airportCount;
 }
 
 static Node* createNode(const char* key, const char* name)
 {
     Node* node = malloc(sizeof(Node));
-    if (node == NULL) return NULL;
+    if (node == NULL)
+        return NULL;
 
     node->key = malloc(strlen(key) + 1);
     node->airportName = malloc(strlen(name) + 1);
@@ -55,7 +56,8 @@ static Node* createNode(const char* key, const char* name)
 AVLTree* createAVLTree(void)
 {
     AVLTree* tree = malloc(sizeof(AVLTree));
-    if (tree == NULL) return NULL;
+    if (tree == NULL)
+        return NULL;
 
     tree->root = NULL;
     tree->airportCount = 0;
@@ -70,7 +72,8 @@ static int getHeight(Node* node)
 
 static void updateHeight(Node* node)
 {
-    if (!node) return;
+    if (!node)
+        return;
 
     int leftH = getHeight(node->leftNode);
     int rightH = getHeight(node->rightNode);
@@ -79,9 +82,11 @@ static void updateHeight(Node* node)
 
 static Node* rotateLeft(Node* a)
 {
-    if (!a) return NULL;
+    if (!a)
+        return NULL;
     Node* b = a->rightNode;
-    if (!b) return a;
+    if (!b)
+        return a;
     Node* c = b->leftNode;
 
     b->leftNode = a;
@@ -112,19 +117,22 @@ static int getBalance(Node* node)
     return node ? getHeight(node->leftNode) - getHeight(node->rightNode) : 0;
 }
 
-static Node* rotateLeftRight(Node* node) {
+static Node* rotateLeftRight(Node* node)
+{
     node->leftNode = rotateLeft(node->leftNode);
     return rotateRight(node);
 }
 
-static Node* rotateRightLeft(Node* node) {
+static Node* rotateRightLeft(Node* node)
+{
     node->rightNode = rotateRight(node->rightNode);
     return rotateLeft(node);
 }
 
 static Node* balance(Node* node)
 {
-    if (node == NULL) return NULL;
+    if (node == NULL)
+        return NULL;
 
     int balance = getBalance(node);
 
@@ -164,7 +172,8 @@ AVLTree* loadAirports(AVLTree* tree)
 {
     if (tree == NULL) {
         tree = createAVLTree();
-        if (tree == NULL) return NULL;
+        if (tree == NULL)
+            return NULL;
     }
 
     FILE* f = fopen("airports.txt", "r");
@@ -258,17 +267,21 @@ static void saveNode(FILE* f, Node* node) // NOLINT(misc-no-recursion)
 
 char* findAirport(AVLTree* tree, const char* key)
 {
-    if (tree == NULL || tree->root == NULL) return NULL;
+    if (tree == NULL || tree->root == NULL)
+        return NULL;
     Node* node = findNode(tree->root, key);
-    if (node == NULL) return NULL;
+    if (node == NULL)
+        return NULL;
     return node->airportName;
 }
 
 int addAirport(AVLTree* tree, char* key, char* name)
 {
-    if (tree == NULL) return -1;
-    
-    if (findNode(tree->root, key) != NULL) return -1;
+    if (tree == NULL)
+        return -1;
+
+    if (findNode(tree->root, key) != NULL)
+        return -1;
 
     tree->root = addNode(tree->root, key, name);
     tree->airportCount++;
@@ -278,8 +291,10 @@ int addAirport(AVLTree* tree, char* key, char* name)
 
 int deleteAirport(AVLTree* tree, const char* key)
 {
-    if (tree == NULL || tree->root == NULL) return -1;
-    if (findNode(tree->root, key) == NULL) return -1;
+    if (tree == NULL || tree->root == NULL)
+        return -1;
+    if (findNode(tree->root, key) == NULL)
+        return -1;
     tree->root = deleteNode(tree->root, key);
     tree->airportCount--;
 
@@ -288,9 +303,11 @@ int deleteAirport(AVLTree* tree, const char* key)
 
 unsigned int saveCurrentStatus(AVLTree* tree)
 {
-    if (tree == NULL || tree->root == NULL) return -1;
+    if (tree == NULL || tree->root == NULL)
+        return -1;
     FILE* f = fopen("airports.txt", "w");
-    if (!f) return -1;
+    if (!f)
+        return -1;
     saveNode(f, tree->root);
     fclose(f);
     return tree->airportCount;
