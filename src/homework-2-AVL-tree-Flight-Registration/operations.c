@@ -7,41 +7,55 @@
 #define MAXKEYLENGTH 10
 #define MAXNAMELENGTH 90
 
-Node* createNode(const char* key, const char* name)
+// структура узла АВЛ-дерева
+typedef struct Node {
+    char* key;
+    char* airportName;
+    struct Node* leftNode;
+    struct Node* rightNode;
+    int height; // разница высот левого и правого узла
+} Node;
+
+// структура АВЛ-дерева
+typedef struct AVLTree {
+    Node* root;
+    unsigned int airportCount;
+} AVLTree;
+
+
+unsigned int getAirportCount(const AVLTree* tree) {
+    return tree->airportCount;
+}
+
+static Node* createNode(const char* key, const char* name)
 {
     Node* node = malloc(sizeof(Node));
-    if (node == NULL) {
-        printf("Ошибка выделения памяти для узла.\n") return NULL;
-    }
+    if (node == NULL) return NULL;
 
     node->key = malloc(strlen(key) + 1);
     node->airportName = malloc(strlen(name) + 1);
 
     if (node->key == NULL || node->airportName == NULL) {
-        printf("Ошибка выделения памяти для данных узла.\n")
-            free(node->key);
+        free(node->key);
         free(node->airportName);
         free(node);
         return NULL;
     }
 
-    strcpy(node->key, key);
-    strcpy(node->airportName, name);
+    memcpy(node->key, key, strlen(key) + 1);
+    memcpy(node->airportName, name, strlen(name) + 1);
 
     node->leftNode = NULL;
     node->rightNode = NULL;
-    node->parentNode = NULL;
     node->height = 1;
 
     return node;
 }
 
-AVLTree* createAVLTree()
+AVLTree* createAVLTree(void)
 {
     AVLTree* tree = malloc(sizeof(AVLTree));
-    if (tree == NULL) {
-        printf("Ошибка выделения памяти для дерева.\n") return NULL;
-    }
+    if (tree == NULL) return NULL;
 
     tree->root = NULL;
     tree->airportCount = 0;
@@ -49,32 +63,29 @@ AVLTree* createAVLTree()
     return tree;
 }
 
-int getHeight(Node* node)
+static int getHeight(Node* node)
 {
     return node ? node->height : 0;
 }
 
-void updateHeight(Node* node)
+static void updateHeight(Node* node)
 {
-    if (node) {
-        int leftH = getHeight(node->leftNode);
-        int rightH = getHeight(node->rightNode);
-        node->height = 1 + (leftH > rightH ? leftH : rightH);
-    }
+    if (!node) return;
+
+    int leftH = getHeight(node->leftNode);
+    int rightH = getHeight(node->rightNode);
+    node->height = 1 + (leftH > rightH ? leftH : rightH);
 }
 
-Node* rotateLeft(Node* a)
+static Node* rotateLeft(Node* a)
 {
+    if (!a) return NULL;
     Node* b = a->rightNode;
+    if (!b) return a;
     Node* c = b->leftNode;
 
     b->leftNode = a;
     a->rightNode = c;
-
-    if (c)
-        c->parentNode = a;
-    b->parentNode = a->parentNode;
-    a->parentNode = b;
 
     updateHeight(a);
     updateHeight(b);
@@ -82,7 +93,7 @@ Node* rotateLeft(Node* a)
     return b;
 }
 
-Node* rotateRight(Node* a)
+static Node* rotateRight(Node* a)
 {
     Node* b = a->leftNode;
     Node* c = b->rightNode;
@@ -90,51 +101,48 @@ Node* rotateRight(Node* a)
     b->rightNode = a;
     a->leftNode = c;
 
-    if (c)
-        c->parentNode = a;
-    b->parentNode = a->parentNode;
-    a->parentNode = b;
-
     updateHeight(a);
     updateHeight(b);
 
     return b;
 }
 
-int getBalance(Node* node)
+static int getBalance(Node* node)
 {
     return node ? getHeight(node->leftNode) - getHeight(node->rightNode) : 0;
 }
 
-Node* balance(Node* node)
+static Node* rotateLeftRight(Node* node) {
+    node->leftNode = rotateLeft(node->leftNode);
+    return rotateRight(node);
+}
+
+static Node* rotateRightLeft(Node* node) {
+    node->rightNode = rotateRight(node->rightNode);
+    return rotateLeft(node);
+}
+
+static Node* balance(Node* node)
 {
-    if (node == NULL) {
-        printf("Ошибка выделения памяти для узла.\n") return NULL;
-    }
+    if (node == NULL) return NULL;
 
-    int bal = getBalance(node);
+    int balance = getBalance(node);
 
-    if (bal > 1) {
-        if (getBalance(node->leftNode) < 0) {
-            node->leftNode = rotateLeft(node->leftNode);
-            if (node->leftNode)
-                node->leftNode->parentNode = node;
-        }
+    if (balance > 1) {
+        if (getBalance(node->leftNode) < 0)
+            return rotateLeftRight(node);
         return rotateRight(node);
     }
 
-    if (bal < -1) {
-        if (getBalance(node->rightNode) > 0) {
-            node->rightNode = rotateRight(node->rightNode);
-            if (node->rightNode)
-                node->rightNode->parentNode = node;
-        }
+    if (balance < -1) {
+        if (getBalance(node->rightNode) > 0)
+            return rotateRightLeft(node);
         return rotateLeft(node);
     }
     return node;
 }
 
-Node* addNode(Node* root, const char* key, const char* name)
+static Node* addNode(Node* root, const char* key, const char* name) // NOLINT(misc-no-recursion)
 {
     if (root == NULL)
         return createNode(key, name);
@@ -142,12 +150,8 @@ Node* addNode(Node* root, const char* key, const char* name)
     int cmp = strcmp(key, root->key);
     if (cmp < 0) {
         root->leftNode = addNode(root->leftNode, key, name);
-        if (root->leftNode)
-            root->leftNode->parentNode = root;
     } else if (cmp > 0) {
         root->rightNode = addNode(root->rightNode, key, name);
-        if (root->rightNode)
-            root->rightNode->parentNode = root;
     } else {
         return root;
     }
@@ -156,22 +160,17 @@ Node* addNode(Node* root, const char* key, const char* name)
     return balance(root);
 }
 
-AVLTree* tree = NULL;
-
-int loadAirports()
+AVLTree* loadAirports(AVLTree* tree)
 {
     if (tree == NULL) {
         tree = createAVLTree();
-        if (tree == NULL) {
-            printf("Ошибка создания дерева.\n");
-            return -1;
-        }
+        if (tree == NULL) return NULL;
     }
 
     FILE* f = fopen("airports.txt", "r");
     if (!f) {
-        printf("Ошибка при открытии файла для записи.\n");
-        return -1;
+        quit(tree);
+        return NULL;
     }
     char line[MAXLINELENGTH];
     char airportKey[MAXKEYLENGTH];
@@ -186,10 +185,10 @@ int loadAirports()
     }
     fclose(f);
     tree->airportCount = count;
-    return count;
+    return tree;
 }
 
-Node* findNode(Node* root, const char* key)
+static Node* findNode(Node* root, const char* key) // NOLINT(misc-no-recursion)
 {
     if (root == NULL)
         return NULL;
@@ -201,7 +200,7 @@ Node* findNode(Node* root, const char* key)
     return root;
 }
 
-Node* minValueNode(Node* node)
+static Node* minValueNode(Node* node)
 {
     Node* current = node;
     while (current && current->leftNode)
@@ -209,7 +208,7 @@ Node* minValueNode(Node* node)
     return current;
 }
 
-Node* deleteNode(Node* root, const char* key)
+static Node* deleteNode(Node* root, const char* key) // NOLINT(misc-no-recursion)
 {
     if (root == NULL)
         return NULL;
@@ -217,12 +216,8 @@ Node* deleteNode(Node* root, const char* key)
     int cmp = strcmp(key, root->key);
     if (cmp < 0) {
         root->leftNode = deleteNode(root->leftNode, key);
-        if (root->leftNode)
-            root->leftNode->parentNode = root;
     } else if (cmp > 0) {
         root->rightNode = deleteNode(root->rightNode, key);
-        if (root->rightNode)
-            root->rightNode->parentNode = root;
     } else {
         if (root->leftNode == NULL) {
             Node* temp = root->rightNode;
@@ -243,18 +238,16 @@ Node* deleteNode(Node* root, const char* key)
         free(root->airportName);
         root->key = malloc(strlen(temp->key) + 1);
         root->airportName = malloc(strlen(temp->airportName) + 1);
-        strcpy(root->key, temp->key);
-        strcpy(root->airportName, temp->airportName);
+        memcpy(root->key, temp->key, strlen(temp->key) + 1);
+        memcpy(root->airportName, temp->airportName, strlen(temp->airportName));
         root->rightNode = deleteNode(root->rightNode, temp->key);
-        if (root->rightNode)
-            root->rightNode->parentNode = root;
     }
 
     updateHeight(root);
     return balance(root);
 }
 
-void saveNode(FILE* f, Node* node)
+static void saveNode(FILE* f, Node* node) // NOLINT(misc-no-recursion)
 {
     if (node) {
         saveNode(f, node->leftNode);
@@ -263,76 +256,47 @@ void saveNode(FILE* f, Node* node)
     }
 }
 
-void findAirport(const char* key)
+char* findAirport(AVLTree* tree, const char* key)
 {
-    if (tree == NULL || tree->root == NULL) {
-        printf("База данных не загружена или пуста.\n");
-        return;
-    }
+    if (tree == NULL || tree->root == NULL) return NULL;
     Node* node = findNode(tree->root, key);
-    if (node) {
-        printf("%s → %s\n", key, node->airportName);
-    } else {
-        printf("Аэропорт с кодом '%s' не найден в базе.\n", key);
-    }
+    if (node == NULL) return NULL;
+    return node->airportName;
 }
 
-void addAirport(const char* argument)
+int addAirport(AVLTree* tree, char* key, char* name)
 {
-    if (tree == NULL) {
-        tree = createAVLTree();
-        if (tree == NULL) {
-            printf("Ошибка создания дерева.\n");
-            return;
-        }
-    }
+    if (tree == NULL) return -1;
+    
+    if (findNode(tree->root, key) != NULL) return -1;
 
-    char key[MAXKEYLENGTH];
-    char name[MAXNAMELENGTH];
+    tree->root = addNode(tree->root, key, name);
+    tree->airportCount++;
 
-    if (sscanf(argument, "%[^:]:%[^\n]", key, name) == 2) {
-        if (findNode(tree->root, key) != NULL) {
-            printf("Аэропорт с кодом '%s' уже существует.\n", key);
-            return;
-        }
-        tree->root = addNode(tree->root, key, name);
-        tree->airportCount++;
-        printf("Аэропорт '%s' добавлен в базу.\n", key);
-    }
+    return 0;
 }
 
-void deleteAirport(const char* key)
+int deleteAirport(AVLTree* tree, const char* key)
 {
-    if (tree == NULL || tree->root == NULL) {
-        printf("База данных не загружена или пуста.\n");
-        return;
-    }
-    if (findNode(tree->root, key) == NULL) {
-        printf("Аэропорт с кодом '%s' не найден в базе.\n", key);
-        return;
-    }
+    if (tree == NULL || tree->root == NULL) return -1;
+    if (findNode(tree->root, key) == NULL) return -1;
     tree->root = deleteNode(tree->root, key);
     tree->airportCount--;
-    printf("Аэропорт '%s' удалён из базы.\n", key);
+
+    return 0;
 }
 
-void saveCurrentStatus()
+unsigned int saveCurrentStatus(AVLTree* tree)
 {
-    if (tree == NULL || tree->root == NULL) {
-        printf("Нет данных для сохранения.\n");
-        return;
-    }
+    if (tree == NULL || tree->root == NULL) return -1;
     FILE* f = fopen("airports.txt", "w");
-    if (!f) {
-        printf("Ошибка при открытии файла для записи.\n");
-        return;
-    }
+    if (!f) return -1;
     saveNode(f, tree->root);
     fclose(f);
-    printf("База сохранена: %u аэропортов.\n", tree->airportCount);
+    return tree->airportCount;
 }
 
-void freeSubtree(Node* node)
+static void freeSubtree(Node* node) // NOLINT(misc-no-recursion)
 {
     if (node) {
         freeSubtree(node->leftNode);
@@ -343,12 +307,11 @@ void freeSubtree(Node* node)
     }
 }
 
-void quit()
+void quit(AVLTree* tree)
 {
     if (tree) {
         freeSubtree(tree->root);
         free(tree);
         tree = NULL;
     }
-    exit(0);
 }

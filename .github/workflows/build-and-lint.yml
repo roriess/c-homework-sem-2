@@ -22,3 +22,13 @@ jobs:
       - name: Lint
         run: |
           run-clang-tidy-18 -p=build
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Prepare data
+        run: |
+          python3 prepare.py
+      - name: Run tests
+        run: |
+          ./build/main airports.txt --test 

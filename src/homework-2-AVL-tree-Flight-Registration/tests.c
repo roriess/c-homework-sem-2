@@ -5,116 +5,122 @@
 #include <stdlib.h>
 #include <string.h>
 
-void reset()
+AVLTree* resetTree(void)
 {
-    quit();
-    tree = createAVLTree();
+    AVLTree* tree = createAVLTree();
     if (!tree) {
         printf("Ошибка: не удалось создать дерево.\n");
-        exit(1);
+        return NULL;
     }
+    return tree;
 }
 
-void testAddOneNode()
+void testAddOneNode(void)
 {
-    reset();
+    AVLTree* tree = resetTree();
 
-    addAirport("SVO:Sheremetyevo International Airport");
-    findAirport("SVO");
-    assert(tree->airportCount == 1);
+    addAirport(tree, "SVO", "Sheremetyevo International Airport");
+    findAirport(tree, "SVO");
+    assert(getAirportCount(tree) == 1);
+    quit(tree);
 }
 
-void testAddMultipleNode()
+void testAddMultipleNode(void)
 {
-    reset();
+    AVLTree* tree = resetTree();
 
-    addAirport("C:Charlie");
-    addAirport("A:Alpha");
-    addAirport("B:Bravo");
-    addAirport("D:Delta");
-    addAirport("E:Echo");
+    addAirport(tree, "C", "Charlie");
+    addAirport(tree, "A","Alpha");
+    addAirport(tree, "B", "Bravo");
+    addAirport(tree, "D", "Delta");
+    addAirport(tree, "E", "Echo");
 
-    findAirport("A");
-    findAirport("B");
-    findAirport("C");
-    findAirport("D");
-    findAirport("E");
-    assert(tree->airportCount == 5);
+    findAirport(tree, "A");
+    findAirport(tree, "B");
+    findAirport(tree, "C");
+    findAirport(tree, "D");
+    findAirport(tree, "E");
+    assert(getAirportCount(tree) == 5);
+    quit(tree);
 }
 
-void testAddDuplicateNode()
+void testAddDuplicateNode(void)
 {
-    reset();
+    AVLTree* tree = resetTree();
 
-    addAirport("SVO:Sheremetyevo");
-    addAirport("SVO:Sheremetyevo");
-    assert(tree->airportCount == 1);
+    addAirport(tree, "SVO", "Sheremetyevo");
+    addAirport(tree, "SVO", "Sheremetyevo");
+    assert(getAirportCount(tree) == 1);
+    quit(tree);
 }
 
-void testDeleteExistingNode()
+void testDeleteExistingNode(void)
 {
-    reset();
+    AVLTree* tree = resetTree();
 
-    addAirport("SVO:Sheremetyevo");
-    addAirport("LED:Pulkovo");
+    addAirport(tree, "SVO", "Sheremetyevo");
+    addAirport(tree, "LED", "Pulkovo");
 
-    findAirport("SVO");
-    deleteAirport("SVO");
+    findAirport(tree, "SVO");
+    deleteAirport(tree, "SVO");
 
-    findAirport("SVO");
-    findAirport("LED");
-    assert(tree->airportCount == 1);
+    findAirport(tree, "SVO");
+    findAirport(tree, "LED");
+    assert(getAirportCount(tree) == 1);
+    quit(tree);
 }
 
-void testDeleteNonexistentNode()
+void testDeleteNonexistentNode(void)
 {
-    reset();
+    AVLTree* tree = resetTree();
 
-    addAirport("LED:Pulkovo");
-    deleteAirport("SVO");
-    assert(tree->airportCount == 1);
+    addAirport(tree, "LED", "Pulkovo");
+    deleteAirport(tree, "SVO");
+    assert(getAirportCount(tree) == 1);
+    quit(tree);
 }
 
-void testDeleteWithTwoChildren()
+void testDeleteWithTwoChildren(void)
 {
-    reset();
+    AVLTree* tree = resetTree();
 
-    addAirport("B:Bravo");
-    addAirport("A:Alpha");
-    addAirport("C:Charlie");
-    addAirport("D:Delta");
-    addAirport("E:Echo");
+    addAirport(tree, "B", "Bravo");
+    addAirport(tree, "A", "Alpha");
+    addAirport(tree, "C", "Charlie");
+    addAirport(tree, "D", "Delta");
+    addAirport(tree, "E", "Echo");
 
-    findAirport("C");
-    deleteAirport("C");
+    findAirport(tree, "C");
+    deleteAirport(tree, "C");
 
-    findAirport("C");
+    findAirport(tree, "C");
 
-    findAirport("A");
-    findAirport("B");
-    findAirport("D");
-    findAirport("E");
+    findAirport(tree, "A");
+    findAirport(tree, "B");
+    findAirport(tree, "D");
+    findAirport(tree, "E");
 
-    assert(tree->airportCount == 4);
+    assert(getAirportCount(tree) == 4);
+    quit(tree);
 }
 
-void testSaveFile()
+void testSaveFile(void)
 {
-    reset();
+    AVLTree* tree = resetTree();
 
-    addAirport("SVO:Sheremetyevo");
-    addAirport("LED:Pulkovo");
-    saveCurrentStatus();
+    addAirport(tree, "SVO", "Sheremetyevo");
+    addAirport(tree, "LED", "Pulkovo");
+    saveCurrentStatus(tree);
+    quit(tree);
 
-    quit();
-    tree = createAVLTree();
-    int loaded = loadAirports();
-    assert(loaded == 2);
-    findAirport("SVO");
-    findAirport("LED");
+    AVLTree* newTree = loadAirports(NULL);
+    assert(getAirportCount(newTree) == 2);
+    findAirport(newTree, "SVO");
+    findAirport(newTree, "LED");
+    quit(newTree);
 }
 
-int test()
+int testTree(void)
 {
     testAddOneNode();
     testAddMultipleNode();
@@ -124,6 +130,6 @@ int test()
     testDeleteWithTwoChildren();
     testSaveFile();
 
-    quit();
+    printf("Все тесты пройдены успешно!\n");
     return 0;
 }
